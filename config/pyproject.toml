@@ -1,0 +1,17 @@
+[project]
+name = "config"
+version = "0.1.0"
+description = "The configuration files and environment files for the entire project"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = []
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.uv]
+dev-dependencies = []
+
+[tool.hatch.build.targets.wheel]
+packages = ["./"]

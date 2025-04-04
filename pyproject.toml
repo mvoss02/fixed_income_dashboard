@@ -1,0 +1,35 @@
+[project]
+name = "fixed-income-dashboard"
+version = "0.1.0"
+description = "A simple dashboard displaying various analytics regarding fixed income securities"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    # Internal libraries
+    "config",
+    "fredapi>=0.5.2",
+    "ipykernel>=6.29.5",
+    "loguru>=0.7.3",
+    "matplotlib>=3.10.1",
+    # External Python packages
+    "pandas>=2.2.3",
+    "pyarrow>=19.0.1",
+    "pydantic>=2.11.2",
+    "pydantic-settings>=2.8.1",
+    "streamlit>=1.44.1",
+    "watchdog>=6.0.0",
+]
+
+[dependency-groups]
+dev = [
+    "ruff >= 0.8.6",
+    "pre-commit >= 4.0.1",
+]
+
+[tool.uv.sources]
+data_ingestion = { workspace = true }
+dashboard = { workspace = true }
+config = { workspace = true }
+
+[tool.uv.workspace]
+members = ["services/data_ingestion", "services/dashboard", "config"]

@@ -1,0 +1,7 @@
+[project]
+name = "data-ingestion"
+version = "0.1.0"
+description = "Ingest fixed income securities data from FRED"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = []
