@@ -7,7 +7,7 @@ PYTHON=python3
 APP_FILE=run.py
 
 # Docker configuration
-DOCKER_IMAGE=fixed-income-dashbaord
+DOCKER_IMAGE=fixed-income-dashboard
 DOCKER_TAG=latest
 PORT=8501
 
