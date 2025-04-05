@@ -1,15 +1,3 @@
-# Docker
-
-sudo apt update && sudo apt install docker.io
-
-sudo apt-get install docker-buildx
-
-docker buildx build -t dotnetservice:latest .
-
-sudo usermod -aG docker $USER
-
-newgrp docker
-
 # Bond Analytics Dashboard
 
 A streamlined dashboard for analyzing fixed income securities, featuring U.S. Treasury yield curves, corporate bond comparisons, and portfolio analytics.
