@@ -2,8 +2,6 @@
 
 A streamlined dashboard for analyzing fixed income securities, featuring U.S. Treasury yield curves, corporate bond comparisons, and portfolio analytics.
 
-![Bond Analytics Dashboard](https://github.com/yourusername/bond-analytics-dashboard/raw/main/docs/images/dashboard-preview.png)
-
 ## 🌟 Features
 
 - **Interactive Yield Curves**: View Treasury yield curves for any date in the past year
