@@ -26,7 +26,7 @@ jobs:
 
       - name: Run tests
         run: |
-          pytest tests/test.py
+          uv run pytest tests/test.py
 
       - name: Deploy to Azure VM
         uses: appleboy/ssh-action@v1.0.0
