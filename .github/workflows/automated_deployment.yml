@@ -1,0 +1,42 @@
+name: CI/CD for Bond Analytics Dashboard
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  test-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: |
+          curl -LsSf https://astral.sh/uv/install.sh | sh
+          uv sync
+
+      - name: Run tests
+        run: |
+          pytest tests/
+
+      - name: Deploy to Azure VM
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.AZURE_VM_HOST }}
+          username: ${{ secrets.AZURE_VM_USER }}
+          key: ${{ secrets.AZURE_VM_SSH_KEY }}
+          script: |
+            set -e
+            cd fixed_income_dashboard && git pull || git clone https://github.com/mvoss02/fixed_income_dashboard.git && cd fixed_income_dashboard
+            git pull origin main
+            make ingest-data
+            make stop-docker
+            make run-docker-vm
