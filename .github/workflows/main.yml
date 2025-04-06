@@ -34,7 +34,7 @@ jobs:
         key: ${{ secrets.AZURE_VM_SSH_KEY }}
         script: |
           set -e
-          cd fixed_income_dashboard || git clone https://github.com/mvoss02/fixed_income_dashboard.git && cd fixed_income_dashboard
+          cd fixed_income_dashboard && git pull || git clone https://github.com/mvoss02/fixed_income_dashboard.git && cd fixed_income_dashboard
           git pull origin main
           make ingest-data
           make stop-docker
