@@ -39,4 +39,4 @@ jobs:
           git pull origin main
           make ingest-data
           make stop-docker
-          make run-docker
+          make run-docker-vm
