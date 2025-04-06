@@ -19,8 +19,17 @@ run:
 build-docker:
 	docker build -t $(DOCKER_IMAGE):$(DOCKER_TAG) .
 
+# Build Docker image on VM
+build-docker-vm:
+	docker buildx build -t $(DOCKER_IMAGE):$(DOCKER_TAG) .
+
 # Run Docker container
 run-docker: build-docker
+	docker run \
+		-p $(PORT):$(PORT) $(DOCKER_IMAGE):$(DOCKER_TAG)
+
+# Run Docker container on VM
+run-docker-vm: build-docker-vm
 	docker run \
 		-p $(PORT):$(PORT) $(DOCKER_IMAGE):$(DOCKER_TAG)
 
@@ -32,3 +41,8 @@ stop-docker:
 ingest-data:
 	@echo "Fetching all data..."
 	uv run python services/data_ingestion/fetch_bond_data.py
+
+# Pytest tests
+run-test:
+	@echo "Running testing"
+	pytest tests/test.py
