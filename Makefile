@@ -40,7 +40,7 @@ stop-docker:
 # Ingest data
 ingest-data:
 	@echo "Fetching all data..."
-	uv run python services/data_ingestion/fetch_bond_data.py
+	python services/data_ingestion/fetch_bond_data.py
 
 # Pytest tests
 run-test:
