@@ -39,6 +39,11 @@ jobs:
             set -e
             cd fixed_income_dashboard && git pull || git clone https://github.com/mvoss02/fixed_income_dashboard.git && cd fixed_income_dashboard
             git pull origin main
-            make ingest-data
+
+            # Manually inject the API key as an environment variable
+            export API_KEY=${{ secrets.API_KEY }}
+
+            # Set the environment variable for the uv workspace
+            uv run make ingest-data
             make stop-docker
             make run-docker-vm
