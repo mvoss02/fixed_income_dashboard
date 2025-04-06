@@ -31,6 +31,7 @@ run-docker: build-docker
 # Run Docker container on VM
 run-docker-vm: build-docker-vm
 	docker run \
+		-d \
 		-p $(PORT):$(PORT) $(DOCKER_IMAGE):$(DOCKER_TAG)
 
 # Stop all running containers of this image
