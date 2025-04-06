@@ -44,6 +44,6 @@ jobs:
             export API_KEY=${{ secrets.API_KEY }}
 
             # Set the environment variable for the uv workspace
-            uv run make ingest-data
+            make ingest-data
             make stop-docker
             make run-docker-vm
