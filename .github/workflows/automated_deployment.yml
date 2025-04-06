@@ -42,7 +42,7 @@ jobs:
             else
               git clone https://github.com/mvoss02/fixed_income_dashboard.git
             fi
-            cd fixed_income_dashboard
+            cd fixed_income_dashboard/
             git pull origin main
 
             # Manually inject the API key as an environment variable
