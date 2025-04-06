@@ -21,12 +21,12 @@ jobs:
       - name: Install dependencies
         run: |
           curl -LsSf https://astral.sh/uv/install.sh | sh
-          uv add --dev pytest
+          uv add pytest
           uv sync
 
       - name: Run tests
         run: |
-          pytest tests/
+          pytest tests/test.py
 
       - name: Deploy to Azure VM
         uses: appleboy/ssh-action@v1.0.0
