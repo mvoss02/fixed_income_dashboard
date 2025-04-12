@@ -6,9 +6,13 @@ dist/
 wheels/
 *.egg-info
 .pytest_cache
+.ruff_cache
 
 # Virtual environments
 .venv
 
 # Credential files
 config/config/env/data_credentials.env
+
+# VSCode config
+.vscode

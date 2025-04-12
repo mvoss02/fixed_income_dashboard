@@ -37,7 +37,9 @@ trend_series = ['DGS10', 'T10Y2Y']
 portfolio_series = ['DGS1', 'DGS5', 'DGS10', 'BAA']
 
 # Tab layout
-tab1, tab2, tab3 = st.tabs(['Yield Curves', 'Historical Trends', 'Portfolio Stats'])
+tab1, tab2, tab3, tab4 = st.tabs(
+    ['Yield Curves', 'Historical Trends', 'Portfolio Stats', 'Bond Explanation']
+)
 
 # Tab 1: Yield Curves
 with tab1:
@@ -169,11 +171,70 @@ with tab2:
 with tab3:
     st.header('Portfolio Summary')
     try:
-        portfolio = [
+        # Initial portfolio setup
+        portfolio_initial = [
             {'series': 'DGS1', 'weight': 0.2, 'face_value': 1000, 'coupon': 2.0},
             {'series': 'DGS5', 'weight': 0.3, 'face_value': 1000, 'coupon': 2.5},
             {'series': 'DGS10', 'weight': 0.3, 'face_value': 1000, 'coupon': 3.0},
-            {'series': 'BAA', 'weight': 0.2, 'face_value': 1000, 'coupon': 4.5},
+            {'series': 'DGS30', 'weight': 0.2, 'face_value': 1000, 'coupon': 4.5},
+        ]
+
+        st.subheader('Adjust Portfolio Weights')
+        st.write(
+            'Adjust the sliders below to change the portfolio allocation. Total should equal 100%.'
+        )
+
+        # Create sliders for weight adjustment
+        col1, col2 = st.columns(2)
+
+        with col1:
+            dgs1_weight = st.slider(
+                'DGS1 Weight (%)', 0, 100, int(portfolio_initial[0]['weight'] * 100)
+            )
+            dgs5_weight = st.slider(
+                'DGS5 Weight (%)', 0, 100, int(portfolio_initial[1]['weight'] * 100)
+            )
+
+        with col2:
+            dgs10_weight = st.slider(
+                'DGS10 Weight (%)', 0, 100, int(portfolio_initial[2]['weight'] * 100)
+            )
+            dgs30_weight = st.slider(
+                'DGS30 Weight (%)', 0, 100, int(portfolio_initial[3]['weight'] * 100)
+            )
+
+        # Calculate total weight and show warning if not 100%
+        total_weight = dgs1_weight + dgs5_weight + dgs10_weight + dgs30_weight
+
+        if total_weight != 100:
+            st.warning(f'Total weight is {total_weight}%. Please adjust to total 100%.')
+
+        # Update portfolio with new weights
+        portfolio = [
+            {
+                'series': 'DGS1',
+                'weight': dgs1_weight / 100,
+                'face_value': 1000,
+                'coupon': 2.0,
+            },
+            {
+                'series': 'DGS5',
+                'weight': dgs5_weight / 100,
+                'face_value': 1000,
+                'coupon': 2.5,
+            },
+            {
+                'series': 'DGS10',
+                'weight': dgs10_weight / 100,
+                'face_value': 1000,
+                'coupon': 3.0,
+            },
+            {
+                'series': 'DGS30',
+                'weight': dgs30_weight / 100,
+                'face_value': 1000,
+                'coupon': 4.5,
+            },
         ]
 
         portfolio_df = pd.DataFrame(portfolio)
@@ -182,17 +243,114 @@ with tab3:
             if selected_date in df.index:
                 portfolio_df.loc[i, 'yield'] = df.loc[selected_date, 'yield']
 
+        # Get user investment amount
+        investment_amount = st.number_input(
+            'Total Investment Amount ($)', min_value=1000.0, value=10000.0, step=1000.0
+        )
+
+        # Calculate actual dollar allocations
+        portfolio_df['dollar_allocation'] = portfolio_df['weight'] * investment_amount
+
         # Calculate summary stats
         portfolio_df['weighted_yield'] = portfolio_df['weight'] * portfolio_df['yield']
         avg_yield = portfolio_df['weighted_yield'].sum()
-        total_value = (portfolio_df['face_value'] * portfolio_df['weight']).sum()
+        total_annual_income = (
+            portfolio_df['dollar_allocation'] * portfolio_df['yield'] / 100
+        ).sum()
 
-        st.table(portfolio_df[['series', 'weight', 'yield', 'face_value']])
-        st.write(f'**Average Weighted Yield**: {avg_yield:.2f}%')
-        st.write(f'**Total Portfolio Value**: ${total_value:.2f}')
+        # Formatting for display
+        display_df = portfolio_df[
+            ['series', 'weight', 'yield', 'dollar_allocation']
+        ].copy()
+        display_df['weight'] = display_df['weight'].apply(lambda x: f'{x:.1%}')
+        display_df['yield'] = display_df['yield'].apply(lambda x: f'{x:.2f}%')
+        display_df['dollar_allocation'] = display_df['dollar_allocation'].apply(
+            lambda x: f'${x:,.2f}'
+        )
+        display_df.columns = ['Series', 'Weight', 'Yield', 'Allocation ($)']
+
+        st.subheader('Portfolio Allocation')
+        st.table(display_df)
+
+        col1, col2 = st.columns(2)
+        with col1:
+            st.metric(label='Average Weighted Yield', value=f'{avg_yield:.2f}%')
+        with col2:
+            st.metric(
+                label='Estimated Annual Income', value=f'${total_annual_income:,.2f}'
+            )
+
+        # Limit width
+        _, col2, _ = st.columns([2, 8, 2])
+
+        with col2:
+            # Portfolio Visualization
+            st.header('Portfolio Composition and Yields')
+
+            # Create the visualization
+            fig, ax1 = plt.subplots(figsize=(8, 6))
+
+            bars = ax1.bar(
+                portfolio_df['series'],
+                portfolio_df['weight'],
+                color='tab:blue',
+                label='Weight',
+            )
+            ax1.set_ylabel('Weight')
+            ax1.set_ylim(0, max(portfolio_df['weight']) * 1.2)  # Add some headroom
+            ax1.set_title('Portfolio Allocation and Yields')
+
+            # Add weight labels on top of bars
+            for bar in bars:
+                height = bar.get_height()
+                ax1.annotate(
+                    f'{height:.1%}',
+                    xy=(bar.get_x() + bar.get_width() / 2, height),
+                    xytext=(0, 3),  # 3 points vertical offset
+                    textcoords='offset points',
+                    ha='center',
+                    va='bottom',
+                )
+
+            # Create a second y-axis for yields
+            ax2 = ax1.twinx()
+            line = ax2.plot(
+                portfolio_df['series'],
+                portfolio_df['yield'],
+                color='red',
+                marker='o',
+                linewidth=2,
+                label='Yield (%)',
+            )
+            ax2.set_ylabel('Yield (%)')
+            ax2.tick_params(axis='y')
+
+            # Add yield labels above markers
+            for i, yld in enumerate(portfolio_df['yield']):
+                ax2.annotate(
+                    f'{yld:.2f}%',
+                    xy=(i, yld),
+                    xytext=(0, 4),
+                    textcoords='offset points',
+                    ha='center',
+                    va='bottom',
+                )
+
+            # Add legends with better positioning
+            ax1.legend(loc='upper right', bbox_to_anchor=(1, 1))
+            ax2.legend(loc='upper right', bbox_to_anchor=(1, 0.93))
+
+            # Enhance grid for better readability
+            ax1.grid(True, linestyle='--', alpha=0.3)
+            plt.tight_layout()
+
+            st.pyplot(fig)
     except Exception:
         st.warning('Sorry... No data has been found for this day. Try another one!')
+        # st.error(f"Error details: {e}")
 
+# Tab 4: Bond Explanation
+with tab4:
     # Define the series
     treasury_series = [
         'DGS1MO',
